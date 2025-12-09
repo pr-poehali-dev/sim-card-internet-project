@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -9,6 +9,10 @@ import Icon from '@/components/ui/icon';
 
 const Index = () => {
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
+  const [competitorPrice, setCompetitorPrice] = useState(800);
+  const [monthlyUsage, setMonthlyUsage] = useState(50);
+  const [savings, setSavings] = useState(0);
+  const [yearlySavings, setYearlySavings] = useState(0);
 
   const plans = [
     {
@@ -78,6 +82,44 @@ const Index = () => {
       description: 'Лучшие тарифы на рынке без переплат'
     }
   ];
+
+  const reviews = [
+    {
+      name: 'Алексей М.',
+      rating: 5,
+      text: 'Перешёл на SimFree 3 месяца назад - лучшее решение! Реально безлимит, скорость отличная, поддержка всегда помогает.',
+      date: 'Неделю назад',
+      avatar: '👨‍💼'
+    },
+    {
+      name: 'Мария К.',
+      rating: 5,
+      text: 'Экономлю 300₽ каждый месяц по сравнению со старым оператором. Качество связи даже лучше стало!',
+      date: '2 недели назад',
+      avatar: '👩‍💻'
+    },
+    {
+      name: 'Дмитрий П.',
+      rating: 5,
+      text: 'Пользуюсь полгода, ни разу не пожалел. Скорость стабильная даже в метро, безлимит без ограничений.',
+      date: 'Месяц назад',
+      avatar: '👨‍🎓'
+    },
+    {
+      name: 'Елена В.',
+      rating: 5,
+      text: 'Оформила онлайн, доставили на следующий день. Все четко и быстро. Рекомендую!',
+      date: '3 дня назад',
+      avatar: '👩‍🔬'
+    }
+  ];
+
+  useEffect(() => {
+    const ourPrice = 590;
+    const monthlySave = competitorPrice - ourPrice;
+    setSavings(monthlySave);
+    setYearlySavings(monthlySave * 12);
+  }, [competitorPrice]);
 
   const handleOrderSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -207,6 +249,98 @@ const Index = () => {
         </div>
       </section>
 
+      <section className="py-20 px-4 bg-white/50 backdrop-blur-sm">
+        <div className="container mx-auto max-w-5xl">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              Калькулятор экономии
+            </h2>
+            <p className="text-xl text-gray-600">
+              Узнайте, сколько сможете сэкономить с SimFree
+            </p>
+          </div>
+
+          <Card className="border-2 border-purple-100 shadow-xl">
+            <CardContent className="p-8">
+              <div className="grid md:grid-cols-2 gap-8">
+                <div>
+                  <Label htmlFor="competitor" className="text-lg mb-3 block">
+                    Текущий платеж у другого оператора
+                  </Label>
+                  <div className="flex items-center gap-4">
+                    <Input
+                      id="competitor"
+                      type="number"
+                      value={competitorPrice}
+                      onChange={(e) => setCompetitorPrice(Number(e.target.value))}
+                      className="h-14 text-xl"
+                      min="0"
+                      max="5000"
+                    />
+                    <span className="text-2xl font-bold">₽</span>
+                  </div>
+                  <input
+                    type="range"
+                    value={competitorPrice}
+                    onChange={(e) => setCompetitorPrice(Number(e.target.value))}
+                    min="200"
+                    max="2000"
+                    step="50"
+                    className="w-full mt-4 h-2 bg-purple-200 rounded-lg appearance-none cursor-pointer accent-purple-600"
+                  />
+                  <p className="text-sm text-gray-500 mt-2">Переместите ползунок</p>
+                </div>
+
+                <div className="flex flex-col justify-center">
+                  <div className="bg-gradient-to-br from-purple-600 to-pink-600 text-white rounded-2xl p-6">
+                    <div className="text-center mb-4">
+                      <Icon name="PiggyBank" className="mx-auto mb-2" size={48} />
+                      <h3 className="text-2xl font-bold mb-2">Ваша экономия</h3>
+                    </div>
+                    
+                    {savings > 0 ? (
+                      <>
+                        <div className="text-center mb-4">
+                          <div className="text-5xl font-extrabold mb-1">
+                            {savings}₽
+                          </div>
+                          <div className="text-lg opacity-90">в месяц</div>
+                        </div>
+                        
+                        <div className="border-t border-white/30 pt-4 text-center">
+                          <div className="text-3xl font-bold mb-1">
+                            {yearlySavings.toLocaleString()}₽
+                          </div>
+                          <div className="text-lg opacity-90">за год</div>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="text-center py-4">
+                        <p className="text-lg">Наш тариф уже выгоднее! 🎉</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-8 text-center">
+                <p className="text-gray-600 mb-4">
+                  Наш тариф "Стандарт" всего <span className="font-bold text-purple-600">590₽/месяц</span> с безлимитным интернетом
+                </p>
+                <Button 
+                  size="lg"
+                  className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+                  onClick={() => document.getElementById('order')?.scrollIntoView({ behavior: 'smooth' })}
+                >
+                  <Icon name="Rocket" className="mr-2" size={20} />
+                  Перейти на выгодный тариф
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
       <section id="advantages" className="py-20 px-4">
         <div className="container mx-auto">
           <div className="text-center mb-16">
@@ -235,6 +369,54 @@ const Index = () => {
                 </CardContent>
               </Card>
             ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="py-20 px-4 bg-white/50 backdrop-blur-sm">
+        <div className="container mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              Отзывы наших клиентов
+            </h2>
+            <p className="text-xl text-gray-600">
+              Более 500 000 довольных пользователей уже с нами
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+            {reviews.map((review, index) => (
+              <Card key={index} className="border-2 border-purple-100 hover:shadow-xl transition-all duration-300">
+                <CardHeader>
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center text-2xl">
+                        {review.avatar}
+                      </div>
+                      <div>
+                        <CardTitle className="text-lg">{review.name}</CardTitle>
+                        <p className="text-sm text-gray-500">{review.date}</p>
+                      </div>
+                    </div>
+                    <div className="flex gap-1">
+                      {Array.from({ length: review.rating }).map((_, i) => (
+                        <Icon key={i} name="Star" className="text-yellow-500 fill-yellow-500" size={16} />
+                      ))}
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-gray-700 leading-relaxed">{review.text}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          <div className="text-center mt-12">
+            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-4 rounded-full text-lg font-semibold">
+              <Icon name="Award" size={24} />
+              <span>Средняя оценка 4.9/5 на основе 12 500+ отзывов</span>
+            </div>
           </div>
         </div>
       </section>
